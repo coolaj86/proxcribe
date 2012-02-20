@@ -1,0 +1,6 @@
+node_modules
+config.js
+*~
+*.swp
+*.swo
+public

@@ -1,0 +1,28 @@
+{
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)",
+  "name": "proxcribe-client",
+  "description": "A browser-based client for proxcribe",
+  "version": "0.1.0",
+  "homepage": "http://proxcribe.coolaj86.info",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coolaj86/proxcribe.git"
+  },
+  "main": "lib/index",
+  "engines": {
+    "node": ">= 0.4.0"
+  },
+  "browserDependencies": {
+    "ahr2": "2.x",
+    "serialize-form": "1.x",
+    "bonzo": "0.9.x",
+    "qwery": "3.x",
+    "bean": "0.4.x",
+    "pure": "2.x",
+    "socket.io-browser": "0.8.x",
+    "domready": "0.2.x"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {}
+}

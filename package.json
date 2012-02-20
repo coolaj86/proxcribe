@@ -1,0 +1,19 @@
+{
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)",
+  "name": "proxcribe",
+  "description": "Proxcription server",
+  "version": "0.1.0",
+  "repository": {
+    "url": ""
+  },
+  "main": "app",
+  "engines": {
+    "node": ">= 0.4"
+  },
+  "dependencies": {
+    "steve": "0.5.x",
+    "socket.io": "0.8.x"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
+}

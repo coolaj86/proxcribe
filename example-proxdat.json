@@ -1,0 +1,32 @@
+[
+    {
+        "host": "http://device.example.com/api/"
+      , "uptime": "1234567"
+      , "runtime": "87464"
+      , "resources": [
+            {
+                "name": "thingy.json"
+              , "count": 643
+            }
+          , {
+                "name": "stuff.json"
+              , "count": 452
+            }
+        ]
+    }
+  , {
+        "host": "http://other.example.com/api/"
+      , "uptime": "17753"
+      , "runtime": "87424"
+      , "resources": [
+            {
+                "name": "thingy.json"
+              , "count": 677
+            }
+          , {
+                "name": "stuff.json"
+              , "count": 520
+            }
+        ]
+    }
+]
