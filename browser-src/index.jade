@@ -23,15 +23,26 @@ html
           tbody
             tr
               td
-                input(name="device", type="text", value="http://syndicate.coolaj86.info:3737")
+                | http://
+                //-input(name="host", type="text", value="syndicate.coolaj86.info:3737")
+                select(name="host")
+                  option(value="spotter22.spotter360.org") spotter22.spotter360.org
+                  option(value="remote.spotterrf.com:7771") remote.spotterrf.com:7771
+                  option(value="remote.spotterrf.com:7772") remote.spotterrf.com:7772
+                  option(value="remote.spotterrf.com:7773") remote.spotterrf.com:7773
+                  option(value="remote.spotterrf.com:7774") remote.spotterrf.com:7774
               td
-                select(name="resources")
-                  option(value="foo.json") foo.json
+                //-input(name="resource", type="text", value="foo.json")
+                select(name="resource")
+                  option(value="tracks.json") tracks.json
+                  option(value="cot.track.xml") cot.track.xml
+                  option(value="gps.json") gps.json
+                  option(value="detections.json") detections.json
               td
-                input(type="text", disabled="disabled", value="this")
+                //-input(type="text", disabled="disabled", value="this")
               td
-                select(name="protocols")
-                  option(value="get", selected="selected") http (GET)
+                select(name="protocol")
+                  //-option(value="get", selected="selected") http (GET)
                   option(value="http:") http:
                   option(value="tcp:") tcp:
                   option(value="udp:") udp:
@@ -59,3 +70,6 @@ html
               td.packettype
                 ul
                   li geolocation.json
+              td.size
+                ul
+                  li 0

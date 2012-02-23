@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "steve": "0.5.x",
+    "node-uuid": "1.x",
+    "forEachAsync": "2.x",
     "socket.io": "0.8.x"
   },
   "devDependencies": {},

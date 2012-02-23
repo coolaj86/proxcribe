@@ -119,9 +119,9 @@
     function subscribeOnDevice(cb, resourceUrl, pushNotification) {
 
       function subscribe() {
-        console.log('subscribe', resourceUrl + '/subscribe');
+        //console.log('subscribe', resourceUrl + '/subscribe');
         request.post(resourceUrl + '/subscribe', null, pushNotification).when(function (err, ahr, data) {
-          console.log('subscribed', resourceUrl + '/subscribe');
+          //console.log('subscribed', resourceUrl + '/subscribe');
           if (err) {
             console.error(err.stack);
             return;
@@ -132,26 +132,52 @@
 
       function unsubscribeOne(next, id) {
         // TODO error checking
-        console.log('unsubscribe', resourceUrl + '/subscriptions/' + id);
+        //console.log('unsubscribe', resourceUrl + '/subscriptions/' + id);
         request.post(resourceUrl + '/unsubscribe', null, { id: id }).when(next);
       }
 
-      function unsubscribeAll(err, ahr, data) {
-        if (!data || !data.result) {
-          err = err || data && data.errors[0];
-          console.error('Error getting subscription list');
-          console.error(err);
-          return;
-        }
-        
-        console.log('subscriptions', resourceUrl + '/subscriptions');
-        forEachAsync(Object.keys(data.result), unsubscribeOne).then(subscribe);
+      function unsubscribeAll(callback) {
+        //console.log('subscriptions', resourceUrl + '/subscriptions');
+
+        request.get(resourceUrl + '/subscriptions').when(function (err, ahr, data) {
+          if (err || !data) {
+            console.error('Error getting subscription list');
+            console.error(err);
+            emitter.emit('error', err || new Error('Error getting subscription list'));
+            return;
+          }
+
+          if (data.error) {
+            err = Array.isArray(data.errors) ? data.errors[0] : data.errors;
+            console.error('Internal error from Device');
+            console.error(err);
+            emitter.emit('error', err);
+            return;
+          }
+
+          if (!data.result) {
+            console.error('Invalid data returned from Device');  
+            console.error(data);
+            emitter.emit('error', new Error('Invalid data returned from Device'));
+            return;
+          }
+
+          forEachAsync(Object.keys(data.result), unsubscribeOne).then(callback);
+        });
+
       }
 
-      request.get(resourceUrl + '/subscriptions').when(unsubscribeAll);
+      unsubscribeAll(subscribe);
+
+      return function () {
+        unsubscribeAll(function () {});
+      };
     }
 
     function forwardProxcription(err, vpsreq, result) {
+      var unsubscribe
+        ;
+
       function getData() {
         var intervalToken
           , metas
@@ -171,6 +197,7 @@
 
           if (numRequests >= maxRequests) {
             vpsreq.close(reformat);
+            unsubscribe();
             keepOnKeepingOn = false;
             return;
           }
@@ -217,14 +244,16 @@
       //params.hostname = result.hostname || netqHost; 
       params.port = result.port;
       
-      subscribeOnDevice(getData, listener.resourceUrl, params);
+      // TODO better passing of this unsubscriber
+      unsubscribe = subscribeOnDevice(getData, listener.resourceUrl, params);
     }
 
     // the sensor can't resolve so well
     dns.resolve4(nq.hostname, function (err, addresses) {
       if (err) {
         console.error('dns issues');
-        console.error(err);
+        console.error(nq);
+        console.error(err.stack);
         return;
       }
 
