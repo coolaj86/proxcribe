@@ -92,6 +92,7 @@
         , "name": proxcription.resource
         , "count": proxcription.count
         , "size": proxcription.size
+        , "protocol": proxcription.protocol
       }
       host.resources.push(resource);
     });
