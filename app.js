@@ -5,13 +5,13 @@
     , socketIo = require('socket.io')
     , fs = require('fs')
     , Proxcribe = require('./index')
-    , proxdat = JSON.parse(fs.readFileSync('./example-proxdat.json'))
     , UUID = require('node-uuid')
     , url = require('url')
     , server
     , io
     , proxcriptions = {}
     , port = process.argv[2]
+    , proxdat = JSON.parse(fs.readFileSync(__dirname + '/example-proxdat.json'))
     ;
 
   function dummyProxdat(req, res, next) {
