@@ -84,12 +84,14 @@
               } 
             , ".packets ul": {
                   "res<-dev.resources": {
-                    "li": "res.count"
+                      "li": "res.count"
                   }
               }
             , ".packettype ul": {
                   "res<-dev.resources": {
-                    "li": "res.name"
+                      "li": function (data) {
+                        return data.item.protocol + data.item.name;
+                      }
                   }
               }
             , ".size ul": {

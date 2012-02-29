@@ -10,7 +10,6 @@
     , server
     , io
     , proxcriptions = {}
-    , port = process.argv[2]
     , proxdat = JSON.parse(fs.readFileSync(__dirname + '/example-proxdat.json'))
     ;
 
@@ -201,9 +200,5 @@
   }
   //server.use('/nq', nq.create());
 
-  if (port) {
-    server.listen(port, listening);
-  } else {
-    server.listen(listening);
-  }
+  module.exports = server
 }());
