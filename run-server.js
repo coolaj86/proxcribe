@@ -5,6 +5,8 @@
     , server = require('./server')
     ;
 
+  config.port = config.port || process.argv[2];
+
   function logPort() {
     console.log("Dropsharing on " + server.address().address + ":" + server.address().port);
   }

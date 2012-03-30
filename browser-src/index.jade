@@ -35,6 +35,8 @@ html
                 //-input(name="resource", type="text", value="foo.json")
                 select(name="resource")
                   option(value="tracks.json") tracks.json
+                  option(value="rdm.png") rdm.png
+                  option(value="online.json") online.json
                   option(value="cot.track.xml") cot.track.xml
                   option(value="gps.json") gps.json
                   option(value="detections.json") detections.json
@@ -42,7 +44,7 @@ html
                 //-input(type="text", disabled="disabled", value="this")
               td
                 select(name="protocol")
-                  //-option(value="get", selected="selected") http (GET)
+                  option(value="http-get:", selected="selected") http (GET)
                   option(value="http:") http:
                   option(value="tcp:") tcp:
                   option(value="udp:") udp:

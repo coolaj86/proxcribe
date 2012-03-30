@@ -104,6 +104,83 @@
   }
   setInterval(formatProxdat, 3 * 1000);
 
+
+  var request = require('ahr2')
+    , querystring = require('querystring')
+    , url = require('url')
+    , EventEmitter = require('events').EventEmitter
+    ;
+
+  function ProxcribeGet(target, filter, params) {
+    var self = this
+      , isObj
+      , querystr
+      , urlstr
+      ;
+
+    target.protocol = 'http:'
+    console.log('target');
+    console.log(target);
+    // XXX shouldn't need extra filter.filter
+    filter = (filter && filter.filter) || filter || {};
+    params = params || {};
+
+    isObj = Object.keys(params).some(function (key) {
+      var obj = params[key];
+      if ('object' === typeof obj) {
+        return true;
+      }
+    });
+
+    if (isObj) {
+      filter.json = JSON.stringify(params);
+    } else {
+      Object.keys(params).forEach(function (key) {
+        // could override existing key
+        filter[key] = params[key];
+      });
+    }
+
+    querystr = querystring.stringify(filter);
+    if (querystr) {
+      querystr = '?' + querystr;
+    }
+
+    urlstr = url.format(target) + querystr;
+    console.log('urlstr');
+    console.log(urlstr);
+
+    function getUrl() {
+      request.get(urlstr).when(function (err, ahr, data) {
+        console.log('blah blah blah');
+        if (!data || err) {
+          self.emit('error', err);
+          return;
+        }
+
+        // XXX ahr needs an option for not handling data
+        if ('string' === typeof data) {
+          data = new Buffer(data);
+        } else if (data instanceof Buffer) {
+          // ignore
+        } else {
+          data = new Buffer(JSON.stringify(data));
+        }
+
+        self.emit('data', data);
+        getUrl();
+      });
+    }
+
+    getUrl();
+  }
+
+  ProxcribeGet.prototype = new EventEmitter();
+
+  ProxcribeGet.create = function (a, b, c, d, e) {
+    return new ProxcribeGet(a, b, c, d, e);
+  };
+
   function proxcribeRoute(req, res) {
     var proxcription
       , pushNotification
@@ -128,12 +205,6 @@
     // TODO validate
     // validatePushNotification(req.body);
 
-    if (/get/i.exec(pushNotification.protocol)) {
-      res.error("HTTP GET not yet supported");
-      res.json();
-      return;
-    }
-
     uuid = UUID.v4();
     proxcription = proxcriptions[uuid] = {
         uuid: uuid
@@ -151,12 +222,14 @@
     //urlObj = url.parse(pushNotification.device, true);
     
     netqueueProxy = {
-        hostname: 'nq.foobar3000.com'
-      , port: 8877
-      , pathname: '/nq'
+        hostname: 'sauron.foobar3000.com'
+      //, port: 8877
+      //, pathname: ''
     };
     netqueueTarget = {
         protocol: pushNotification.protocol
+      , host: pushNotification.host
+      , pathname: pushNotification.resource
       , resourceUrl: 'http://' + pushNotification.host + '/' + pushNotification.resource
     };
     netqueueTargetParams = pushNotification.args || {
@@ -167,11 +240,20 @@
     }; // { params: ..., filter: ..., etc}
     console.log('netqueueTarget');
     console.log(netqueueTarget);
-    emitter = proxcriptions[uuid].emitter = Proxcribe.create(
-        netqueueProxy
-      , netqueueTarget
-      , netqueueTargetParams
-    );
+    if (/get/i.exec(pushNotification.protocol)) {
+      emitter = proxcriptions[uuid].emitter = ProxcribeGet.create(
+          netqueueTarget
+        , netqueueTargetParams
+      );
+    } else {
+      emitter = proxcriptions[uuid].emitter = Proxcribe.create(
+          netqueueProxy
+        // XXX target
+        , netqueueTarget
+        // XXX filter, then params
+        , netqueueTargetParams
+      );
+    }
     
     emitter.on('error', function (err) {
       console.error('prox error:');
