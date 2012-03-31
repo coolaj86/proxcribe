@@ -4,7 +4,7 @@
   var connect = require('steve')
     , socketIo = require('socket.io')
     , fs = require('fs')
-    , Proxcribe = require('./index')
+    , Saruman = require('saruman').Saruman
     , UUID = require('node-uuid')
     , url = require('url')
     , server
@@ -84,6 +84,9 @@
 
       // TODO host.uptime
       host.runtime = Math.max(host.runtime, Date.now() - proxcription.createdAt);
+      console.log('uptime');
+      console.log(host.uptime);
+      console.log(proxcription.erroredAt);
       host.uptime = Math.min(host.uptime, Date.now() - proxcription.erroredAt);
 
       resource = {
@@ -184,12 +187,13 @@
   function proxcribeRoute(req, res) {
     var proxcription
       , pushNotification
-      , urlObj
       , uuid
       , emitter
-      , netqueueProxy
-      , netqueueTarget
-      , netqueueTargetParams
+      , proxyInfo
+      , deviceInfo
+      , filter
+      , params
+      , listenerInfo
       ;
 
     pushNotification = req.body;
@@ -205,6 +209,7 @@
     // TODO validate
     // validatePushNotification(req.body);
 
+
     uuid = UUID.v4();
     proxcription = proxcriptions[uuid] = {
         uuid: uuid
@@ -219,40 +224,52 @@
       , count: 0
       , errorCount: 0
     };
-    //urlObj = url.parse(pushNotification.device, true);
     
-    netqueueProxy = {
+
+    proxyInfo = {
         hostname: 'sauron.foobar3000.com'
       //, port: 8877
       //, pathname: ''
     };
-    netqueueTarget = {
+    listenerInfo = {
         protocol: pushNotification.protocol
-      , host: pushNotification.host
-      , pathname: pushNotification.resource
-      , resourceUrl: 'http://' + pushNotification.host + '/' + pushNotification.resource
     };
-    netqueueTargetParams = pushNotification.args || {
-        "filter": {
-            "maxWait": 10 * 1000
-          , "minWait": 3 * 1000
-        }
+    deviceInfo = {
+        host: pushNotification.host
+      , hostname: pushNotification.host.split(':')[0]
+      , port: pushNotification.host.split(':')[1]
+      , resource: pushNotification.resource
+    };
+    filter = pushNotification.filter || {
+        "maxWait": 10 * 1000
+      , "minWait": 3 * 1000
     }; // { params: ..., filter: ..., etc}
-    console.log('netqueueTarget');
-    console.log(netqueueTarget);
+    params = pushNotification.params || {};
+
+
     if (/get/i.exec(pushNotification.protocol)) {
       emitter = proxcriptions[uuid].emitter = ProxcribeGet.create(
-          netqueueTarget
-        , netqueueTargetParams
+          deviceInfo
+        , filter
       );
     } else {
-      emitter = proxcriptions[uuid].emitter = Proxcribe.create(
-          netqueueProxy
-        // XXX target
-        , netqueueTarget
-        // XXX filter, then params
-        , netqueueTargetParams
+      console.log('creating emitter');
+      emitter = proxcriptions[uuid].emitter = Saruman.create(
+          proxyInfo
+        , deviceInfo
+        , listenerInfo
+        , filter
+        , params
       );
+
+      emitter.begin();
+
+      console.log('ALL THE THINGS');
+      console.log(proxyInfo);
+      console.log(listenerInfo);
+      console.log(deviceInfo);
+      console.log(filter);
+      console.log(params);
     }
     
     emitter.on('error', function (err) {
@@ -267,8 +284,10 @@
       var now = Date.now()
         ;
 
+      console.log('now it start the working');
+
       clearTimeout(nodataTimeoutToken);
-      setTimeout(function () {
+      nodataTimeoutToken = setTimeout(function () {
         proxcription.errorCount += 1;
         proxcription.erroredAt = now;
       }, 7 * 1000);
@@ -279,8 +298,8 @@
     });
 
     //emitter.on('end', reformat);
+    res.json("happy day");
   }
-  //server.use('/nq', nq.create());
 
   module.exports = server
 }());

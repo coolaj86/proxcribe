@@ -20,6 +20,7 @@ echo "Copying static assets"
 rsync -a static/ ../public/
 
 cd ../public
-ps aux | grep -v grep | grep "served 5757 ${PWD}" > /dev/null || nohup served 5757 ${PWD} &
+#ps aux | grep -v grep | grep "served 5757 ${PWD}" > /dev/null || nohup served 5757 ${PWD} &
 
-echo "Done and serving at localhost:5757"
+#echo "Done and serving at localhost:5757"
+echo "Done"
